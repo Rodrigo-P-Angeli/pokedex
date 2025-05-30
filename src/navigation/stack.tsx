@@ -5,7 +5,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getAuth, signOut } from "@react-native-firebase/auth";
 import Login from "../screens/Login";
 import SignUp from "../screens/SignUp";
-import Home from "../screens/Home";
+import { PokemonList } from "../screens/PokemonList";
+import { PokemonDetails } from "../screens/PokemonDetails";
 import Splash from "../screens/Splash";
 import theme from "../theme";
 
@@ -15,7 +16,11 @@ export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
   SignUp: undefined;
-  Home: undefined;
+  PokemonList: undefined;
+  PokemonDetails: {
+    pokemonId: number;
+    pokemonName: string;
+  };
 };
 
 export function RootStack() {
@@ -49,11 +54,11 @@ export function RootStack() {
         }}
       />
       <Stack.Screen
-        name="Home"
-        component={Home}
+        name="PokemonList"
+        component={PokemonList}
         options={{
           headerShown: true,
-          title: 'Minha Dex',
+          title: 'Pokédex',
           headerRight: () => (
             <TouchableOpacity
               style={styles.headerButton}
@@ -66,6 +71,13 @@ export function RootStack() {
               />
             </TouchableOpacity>
           ),
+        }}
+      />
+      <Stack.Screen
+        name="PokemonDetails"
+        component={PokemonDetails}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

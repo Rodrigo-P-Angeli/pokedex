@@ -12,12 +12,12 @@ export default function Splash({ navigation }: Props) {
   }, []);
 
   const checkAuth = () => {
-    const unsubscribe = onAuthStateChanged(getAuth(), user => {
+    const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
       // Navigate to appropriate screen based on auth state
       if (user) {
         navigation.reset({
           index: 0,
-          routes: [{ name: "Home" }],
+          routes: [{ name: "PokemonList" }],
         });
         // navigation.replace("Home");
       } else {
