@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "com.moneynow"
+      "bundleIdentifier": "com.pokedex"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +24,7 @@
       },
       "edgeToEdgeEnabled": true,
       "googleServicesFile": "./google-services.json",
-      "package": "com.moneynow"
+      "package": "com.pokedex"
     },
     "web": {
       "favicon": "./assets/favicon.png"

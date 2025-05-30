@@ -16,7 +16,6 @@ import { RootStackParamList } from "../../navigation/stack";
 import {
   getAuth,
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
 } from "@react-native-firebase/auth";
 import {
   collection,
@@ -43,24 +42,99 @@ const SignUp: React.FC<SignUpScreenNavigationProp> = ({ navigation }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
 
-  const validateFields = (): boolean => {
+  useEffect(() => {
+    validateForm();
+  }, [fullName, cpf, email, password, confirmPassword]);
+
+  const validateCPF = (cpf: string): boolean => {
+    const cleanCPF = cpf.replace(/\D/g, "");
+    
+    if (cleanCPF.length !== 11) return false;
+    
+    // Verifica se todos os dígitos são iguais
+    if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
+    
+    // Validação do primeiro dígito verificador
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cleanCPF.charAt(i)) * (10 - i);
+    }
+    let rest = 11 - (sum % 11);
+    let digit1 = rest > 9 ? 0 : rest;
+    
+    // Validação do segundo dígito verificador
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cleanCPF.charAt(i)) * (11 - i);
+    }
+    rest = 11 - (sum % 11);
+    let digit2 = rest > 9 ? 0 : rest;
+    
+    return digit1 === parseInt(cleanCPF.charAt(9)) && 
+           digit2 === parseInt(cleanCPF.charAt(10));
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  const validateForm = () => {
     const newErrors: Record<string, string> = {};
+    let isValid = true;
 
-    if (!fullName.trim()) newErrors.fullName = "Nome completo é obrigatório";
-    if (!cpf.trim()) newErrors.cpf = "CPF é obrigatório";
-    else if (cpf.replace(/\D/g, "").length !== 11)
+    // Validação do nome
+    if (!fullName.trim()) {
+      newErrors.fullName = "Nome completo é obrigatório";
+      isValid = false;
+    } else if (fullName.trim().split(" ").length < 2) {
+      newErrors.fullName = "Digite seu nome completo";
+      isValid = false;
+    }
+
+    // Validação do CPF
+    if (!cpf.trim()) {
+      newErrors.cpf = "CPF é obrigatório";
+      isValid = false;
+    } else if (!validateCPF(cpf)) {
       newErrors.cpf = "CPF inválido";
-    if (!email.trim()) newErrors.email = "Email é obrigatório";
-    else if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = "Email inválido";
-    if (!password) newErrors.password = "Senha é obrigatória";
-    else if (password.length < 6)
+      isValid = false;
+    }
+
+    // Validação do email
+    if (!email.trim()) {
+      newErrors.email = "Email é obrigatório";
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      newErrors.email = "Email inválido";
+      isValid = false;
+    }
+
+    // Validação da senha
+    if (!password) {
+      newErrors.password = "Senha é obrigatória";
+      isValid = false;
+    } else if (password.length < 6) {
       newErrors.password = "Senha deve ter pelo menos 6 caracteres";
-    if (password !== confirmPassword)
+      isValid = false;
+    } else if (!/(?=.*[A-Z])/.test(password)) {
+      newErrors.password = "Senha deve conter pelo menos uma letra maiúscula";
+      isValid = false;
+    } else if (!/(?=.*[0-9])/.test(password)) {
+      newErrors.password = "Senha deve conter pelo menos um número";
+      isValid = false;
+    }
+
+    // Validação da confirmação de senha
+    if (password !== confirmPassword) {
       newErrors.confirmPassword = "As senhas não coincidem";
+      isValid = false;
+    }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setIsFormValid(isValid);
   };
 
   const formatCpf = (text: string): string => {
@@ -74,34 +148,21 @@ const SignUp: React.FC<SignUpScreenNavigationProp> = ({ navigation }) => {
       formattedText = `${formattedText.slice(0, 7)}.${formattedText.slice(7)}`;
     }
     if (numericText.length > 9) {
-      formattedText = `${formattedText.slice(0, 11)}-${formattedText.slice(
-        11
-      )}`;
+      formattedText = `${formattedText.slice(0, 11)}-${formattedText.slice(11)}`;
     }
 
     return formattedText.slice(0, 14);
   };
 
   const handleSignUp = async () => {
-    if (!fullName || !cpf || !email || !password || !confirmPassword) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert("Erro", "As senhas não coincidem");
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres");
+    if (!isFormValid) {
+      Alert.alert("Erro", "Por favor, corrija os erros no formulário");
       return;
     }
 
     setLoading(true);
 
     try {
-      // Cria o usuário no Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(
         getAuth(),
         email,
@@ -117,6 +178,8 @@ const SignUp: React.FC<SignUpScreenNavigationProp> = ({ navigation }) => {
           createdAt: serverTimestamp(),
         }
       );
+
+      Alert.alert("Sucesso", "Conta criada com sucesso!");
     } catch (error: any) {
       let errorMessage = "Erro ao cadastrar";
       if (error.code === "auth/email-already-in-use") {
@@ -173,8 +236,8 @@ const SignUp: React.FC<SignUpScreenNavigationProp> = ({ navigation }) => {
                 onChangeText={setFullName}
               />
             </View>
+            {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
 
-            {/* CPF */}
             <View style={styles.inputContainer}>
               <MaterialCommunityIcons
                 name="card-account-details-outline"
@@ -207,10 +270,11 @@ const SignUp: React.FC<SignUpScreenNavigationProp> = ({ navigation }) => {
                 placeholderTextColor={theme.colors.dark60}
                 value={email}
                 onChangeText={setEmail}
-                autoCapitalize="none"
                 keyboardType="email-address"
+                autoCapitalize="none"
               />
             </View>
+            {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
             <View style={styles.inputContainer}>
               <MaterialCommunityIcons
@@ -229,15 +293,16 @@ const SignUp: React.FC<SignUpScreenNavigationProp> = ({ navigation }) => {
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
-                style={styles.passwordToggle}
+                style={styles.eyeIcon}
               >
                 <MaterialCommunityIcons
-                  name={showPassword ? 'eye-off' : 'eye'}
+                  name={showPassword ? "eye-off" : "eye"}
                   size={24}
                   color={theme.colors.dark60}
                 />
               </TouchableOpacity>
             </View>
+            {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
             <View style={styles.inputContainer}>
               <MaterialCommunityIcons
@@ -256,39 +321,33 @@ const SignUp: React.FC<SignUpScreenNavigationProp> = ({ navigation }) => {
               />
               <TouchableOpacity
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                style={styles.passwordToggle}
+                style={styles.eyeIcon}
               >
                 <MaterialCommunityIcons
-                  name={showConfirmPassword ? 'eye-off' : 'eye'}
+                  name={showConfirmPassword ? "eye-off" : "eye"}
                   size={24}
                   color={theme.colors.dark60}
                 />
               </TouchableOpacity>
             </View>
+            {errors.confirmPassword && (
+              <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+            )}
 
-            {/* Botão de Cadastro */}
             <TouchableOpacity
-              style={styles.button}
+              style={[
+                styles.signUpButton,
+                (!isFormValid || loading) && styles.signUpButtonDisabled,
+              ]}
               onPress={handleSignUp}
-              disabled={loading}
+              disabled={!isFormValid || loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={theme.colors.light} />
               ) : (
-                <Text style={styles.buttonText}>Criar conta</Text>
+                <Text style={styles.signUpButtonText}>Cadastrar</Text>
               )}
             </TouchableOpacity>
-
-            {/* Link para Login */}
-            <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Já tem uma conta? </Text>
-              <TouchableOpacity
-                onPress={() => navigation.pop()}
-                disabled={loading}
-              >
-                <Text style={styles.loginLink}>Faça login</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </ScrollView>
@@ -306,82 +365,71 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 30,
-    paddingVertical: 20,
+    padding: theme.spacing.lg,
   },
   backButton: {
     marginBottom: theme.spacing.lg,
   },
   header: {
-    marginBottom: theme.spacing.xxl,
+    marginBottom: theme.spacing.xl,
   },
   title: {
     ...theme.typography.h1,
     color: theme.colors.dark,
+    marginBottom: theme.spacing.xs,
   },
   subtitle: {
-    ...theme.typography.body1,
+    ...theme.typography.body2,
     color: theme.colors.dark60,
-    marginTop: theme.spacing.xs,
   },
   form: {
-    marginTop: theme.spacing.xl,
+    gap: theme.spacing.md,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: theme.colors.light,
     borderRadius: theme.borderRadius.md,
-    marginBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
     borderWidth: 1,
     borderColor: theme.colors.dark10,
   },
   inputIcon: {
-    padding: theme.spacing.md,
+    marginRight: theme.spacing.sm,
   },
   input: {
     flex: 1,
+    height: 50,
     ...theme.typography.body1,
     color: theme.colors.dark,
-    paddingVertical: theme.spacing.md,
-  },
-  passwordToggle: {
-    padding: theme.spacing.md,
-  },
-  button: {
-    height: 50,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.round,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: theme.spacing.xl,
-    marginBottom: theme.spacing.xl,
-  },
-  buttonText: {
-    color: theme.colors.light,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loginText: {
-    ...theme.typography.body2,
-    color: theme.colors.dark60,
-  },
-  loginLink: {
-    ...theme.typography.body2,
-    color: theme.colors.primary,
   },
   inputError: {
-    borderColor: "#d32f2f",
+    borderColor: theme.colors.danger,
   },
   errorText: {
-    color: "#d32f2f",
-    marginTop: theme.spacing.xs,
+    ...theme.typography.small,
+    color: theme.colors.danger,
+    marginTop: -theme.spacing.sm,
+    marginLeft: theme.spacing.sm,
+  },
+  eyeIcon: {
+    padding: theme.spacing.xs,
+  },
+  signUpButton: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: theme.spacing.lg,
+  },
+  signUpButtonDisabled: {
+    backgroundColor: theme.colors.dark30,
+  },
+  signUpButtonText: {
+    ...theme.typography.body1,
+    color: theme.colors.light,
+    fontWeight: "600",
   },
 });
 

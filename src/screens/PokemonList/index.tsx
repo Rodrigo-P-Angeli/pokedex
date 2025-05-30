@@ -85,7 +85,6 @@ export const PokemonList = ({ navigation }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Pokédex</Text>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color={colors.dark60} />
           <TextInput
@@ -127,18 +126,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.dark10,
   },
-  title: {
-    ...typography.h1,
-    color: colors.dark,
-    marginBottom: spacing.md,
-  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.background,
     borderRadius: borderRadius.md,
-    padding: spacing.sm,
-    marginBottom: spacing.sm,
+    padding: spacing.xs,
+    marginBottom: spacing.xs,
   },
   searchInput: {
     flex: 1,

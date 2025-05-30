@@ -44,7 +44,7 @@ const Login: React.FC<LoginScreenNavigationProp> = ({ navigation }) => {
       // Navega para a tela principal após login bem-sucedido
       navigation.reset({
         index: 0,
-        routes: [{ name: "Home" }],
+        routes: [{ name: "PokemonList" }],
       });
     } catch (error: any) {
       let errorMessage = "Erro ao fazer login";

@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyA9ixKrBTYxXXJjcti9risKMTKlygXVxyg</string>
+	<string>AIzaSyD5wg754r5C-S-hlip3E5-FfFiGFB3zu5c</string>
 	<key>GCM_SENDER_ID</key>
-	<string>746744317801</string>
+	<string>827230575228</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.moneynow</string>
+	<string>com.pokedex</string>
 	<key>PROJECT_ID</key>
-	<string>money-now-b63e6</string>
+	<string>pokedex-268d5</string>
 	<key>STORAGE_BUCKET</key>
-	<string>money-now-b63e6.firebasestorage.app</string>
+	<string>pokedex-268d5.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:746744317801:ios:77bb2c53773bbcf8cf9ff8</string>
+	<string>1:827230575228:ios:39b7464d9bc38d4c6947f9</string>
 </dict>
 </plist>

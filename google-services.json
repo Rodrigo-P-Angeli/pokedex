@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "746744317801",
-    "project_id": "money-now-b63e6",
-    "storage_bucket": "money-now-b63e6.firebasestorage.app"
+    "project_number": "827230575228",
+    "project_id": "pokedex-268d5",
+    "storage_bucket": "pokedex-268d5.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:746744317801:android:c906cefd0aa0eaf3cf9ff8",
+        "mobilesdk_app_id": "1:827230575228:android:9a87287959ae9bb56947f9",
         "android_client_info": {
-          "package_name": "com.moneynow"
+          "package_name": "com.pokedex"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAgvIDACxkc80SBLvU58Ovj4W8u5GuANEg"
+          "current_key": "AIzaSyC8pJFfTAcfjjRpxJUJoz3DLwrqvtn01sY"
         }
       ],
       "services": {

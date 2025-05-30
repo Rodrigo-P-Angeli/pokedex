@@ -19,13 +19,11 @@ export default function Splash({ navigation }: Props) {
           index: 0,
           routes: [{ name: "PokemonList" }],
         });
-        // navigation.replace("Home");
       } else {
         navigation.reset({
           index: 0,
           routes: [{ name: "Login" }],
         });
-        // navigation.replace("Login");
       }
     });
 
