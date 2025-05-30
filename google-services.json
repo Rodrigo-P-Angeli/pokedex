@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "746744317801",
+    "project_id": "money-now-b63e6",
+    "storage_bucket": "money-now-b63e6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746744317801:android:c906cefd0aa0eaf3cf9ff8",
+        "android_client_info": {
+          "package_name": "com.moneynow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgvIDACxkc80SBLvU58Ovj4W8u5GuANEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
