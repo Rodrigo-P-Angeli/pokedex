@@ -76,9 +76,15 @@ export function RootStack() {
       <Stack.Screen
         name="PokemonDetails"
         component={PokemonDetails}
-        options={{
-          headerShown: false,
-        }}
+        options={({ route }) => ({
+          headerShown: true,
+          title: route.params.pokemonName.charAt(0).toUpperCase() + route.params.pokemonName.slice(1),
+          headerBackTitle: 'Back',
+          headerTintColor: theme.colors.dark,
+          headerStyle: {
+            backgroundColor: theme.colors.light,
+          },
+        })}
       />
     </Stack.Navigator>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -13,71 +13,38 @@ import { colors, typography, spacing, borderRadius } from "../../theme";
 import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/stack";
-
-interface Pokemon {
-  id: number;
-  name: string;
-  url: string;
-}
+import { usePokemon } from "../../contexts/PokemonContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, "PokemonList">;
 
 export const PokemonList = ({ navigation }: Props) => {
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { pokemons, loading } = usePokemon();
   const [searchQuery, setSearchQuery] = useState("");
-  const [offset, setOffset] = useState(0);
-  const limit = 20;
-
-  useEffect(() => {
-    fetchPokemons();
-  }, []);
-
-  const fetchPokemons = async () => {
-    try {
-      const response = await fetch(
-        `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
-      );
-      const data = await response.json();
-      setPokemons([...pokemons, ...data.results]);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching pokemons:", error);
-      setLoading(false);
-    }
-  };
-
-  const handleLoadMore = () => {
-    setOffset(offset + limit);
-    fetchPokemons();
-  };
 
   const filteredPokemons = pokemons.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const renderPokemonCard = ({ item }: { item: Pokemon }) => {
-    const pokemonId = item.url.split("/")[6];
-
+  const renderPokemonCard = ({ item }: { item: typeof pokemons[0] }) => {
     return (
       <TouchableOpacity
         style={styles.card}
         onPress={() =>
           navigation.navigate("PokemonDetails", {
-            pokemonId: parseInt(pokemonId),
+            pokemonId: item.id,
             pokemonName: item.name,
           })
         }
       >
         <Image
           source={{
-            uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`,
+            uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${item.id}.png`,
           }}
           style={styles.pokemonImage}
           resizeMode="contain"
         />
         <Text style={styles.pokemonName}>{item.name}</Text>
-        <Text style={styles.pokemonNumber}>#{pokemonId}</Text>
+        <Text style={styles.pokemonNumber}>#{item.id}</Text>
       </TouchableOpacity>
     );
   };
@@ -97,20 +64,19 @@ export const PokemonList = ({ navigation }: Props) => {
         </View>
       </View>
 
-      <FlatList
-        data={filteredPokemons}
-        renderItem={renderPokemonCard}
-        keyExtractor={(item) => item.name}
-        numColumns={2}
-        contentContainerStyle={styles.listContainer}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          loading ? (
-            <ActivityIndicator size="large" color={colors.primary} />
-          ) : null
-        }
-      />
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredPokemons}
+          renderItem={renderPokemonCard}
+          keyExtractor={(item) => item.name}
+          numColumns={2}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
     </View>
   );
 };
@@ -173,5 +139,10 @@ const styles = StyleSheet.create({
     ...typography.small,
     color: colors.dark60,
     marginTop: spacing.xs,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

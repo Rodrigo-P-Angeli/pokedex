@@ -172,16 +172,6 @@ export const PokemonDetails: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.dark} />
-        </TouchableOpacity>
-        <Text style={styles.title}>{pokemonName}</Text>
-      </View>
-
       <ScrollView style={styles.content}>
         <View style={styles.imageContainer}>
           <Image
@@ -276,22 +266,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: spacing.md,
-    backgroundColor: colors.light,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.dark10,
-  },
-  backButton: {
-    padding: spacing.xs,
-  },
-  title: {
-    ...typography.h2,
-    marginLeft: spacing.md,
-    color: colors.dark,
   },
   content: {
     flex: 1,
